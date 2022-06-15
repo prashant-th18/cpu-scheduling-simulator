@@ -40,6 +40,48 @@ def plot_algo_graph(result):
     plt.show()
 
 
+def plot_comparison(algorithms):
+    """
+    Plots the comparison bar graph for different scheduling algorithms.
+
+    Args:
+        algorithms (``Dictionary``) : Array of return value of scheduling algorithms.
+
+    """
+
+    labels = list(map(lambda algo: algo['name'], algorithms))
+
+    avg_waiting_time = list(map(lambda algo: algo['avg_waiting_time'], algorithms))
+    avg_response_time = list(map(lambda algo: algo['avg_response_time'], algorithms))
+    avg_turnaround_time = list(map(lambda algo: algo['avg_turnaround_time'], algorithms))
+
+    x = np.arange(len(algorithms))  # the label locations
+    width = 0.15  # width of each bar
+
+    fig, ax = plt.subplots()
+    rect1 = ax.bar(x - width, avg_waiting_time, width, label='avg_waiting_time')
+    rect2 = ax.bar(x, avg_response_time, width, label='avg_response_time')
+    rect3 = ax.bar(x + width, avg_turnaround_time, width, label='avg_turnaround_time')
+    """
+    Axes.bar() params:
+    First param: list of points of the center of all bars
+    (x - width) => Every element of the 'x' array will be reduces by width
+    Second param: list of height of all bars
+    Third param: width of each bar
+    label: Used for labelling
+    """
+
+    # Adding some information
+    ax.set_xlabel('Algorithms')
+    ax.set_ylabel('Time')
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels)
+    ax.legend()
+
+    plt.title('Comparison of different Scheduling Algorithms')
+    plt.show()
+
+
 colors = [
     "#ED4264",
     "#13c191",
@@ -77,7 +119,7 @@ def plot_gantt(result):
     Plots the Gantt Chart for a particular scheduling algorithm.
 
     Args:
-        result (```Dictionary```) : return value of any scheduling algorithm.
+        result (``Dictionary``) : return value of any scheduling algorithm.
 
     """
 
@@ -91,7 +133,9 @@ def plot_gantt(result):
     ax.set_yticks([10])  # Ticks on y-axis
     ax.set_yticklabels(['1'])  # Labels on y-axis
 
-    ax.set_xticks(tuple(map(lambda gnt: gnt[1][0], gantt)))  # Ticks on x-axis
+    on_x_axis = list(map(lambda gnt: gnt[1][0], gantt))
+    on_x_axis.append(gantt[-1][1][0] + gantt[-1][1][1])  # Now the last mark will also be visible
+    ax.set_xticks(on_x_axis)  # Ticks on x-axis
     # Ticks on x-axis will be on completion times.
 
     # Axes.broken_barh: Plot a horizontal sequence of rectangles.
@@ -105,7 +149,7 @@ def plot_gantt(result):
                    facecolors=tuple(map(lambda gnt: colors[gnt[0]], gantt)))
 
     for gnt in gantt:
-        ax.annotate('P{}'.format(gnt[0]), ((gnt[1][0] + gnt[1][1]) / 2, 5), color='white',
+        ax.annotate('P{}'.format(gnt[0]), (gnt[1][0], 5), color='white',
                     fontweight='bold')
     """
     ax.annotate is responsible for the text we are seeing inside our sub-rectangles
