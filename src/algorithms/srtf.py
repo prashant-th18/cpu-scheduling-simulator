@@ -5,11 +5,11 @@ import src.utils.graph as graph
 
 def run(process):
     """
-        Priority Scheduling (Preemptive)
+        Shortest Remaining Time First
 
     """
 
-    print('running priority preemptive...')
+    print('running srtf...')
 
     gantt = []
 
@@ -35,22 +35,19 @@ def run(process):
     for i in range(n):
         start.append(False)
 
-    while count < n:
+    while count != n:
         flag = False
         while j < n and total_completion_time >= proc[j].arrival_time:
             flag = True
-            # print(j, proc[j].__dict__)
-            li.append([j, [proc[j].priority, proc[j].burst_time]])
+            li.append([j, proc[j].burst_time])
             j += 1
 
-        # print(li)
-
         if flag:
-            li = sorted(li, key=lambda k: k[1][0])
+            li = sorted(li, key=lambda k: k[1])
 
-        index = li[0][0]
+        elem = li.pop(0)
+        index = elem[0]
 
-        # print(total_completion_time, li)
         if pre != -1 and pre != index:
             gantt.append((proc[pre].p_id, (pre_comp, total_completion_time - pre_comp)))
             pre_comp = total_completion_time
@@ -65,20 +62,19 @@ def run(process):
             proc[index].response_time = total_completion_time - proc[index].arrival_time
             total_response_time += proc[index].response_time
 
-        # Check whether this index process will be executed fully first and then a new process will come
-        # or, in between a new process will come
-        fully = False
-        if j == n:
-            fully = True
-        else:
-            t1 = proc[j].arrival_time - total_completion_time
-            t2 = proc[index].burst_time
-            if t2 <= t1:
-                fully = True
+        inside = False
+        while elem[1] > 0 and not inside:
+            elem[1] -= 1
+            total_completion_time += 1
+            while j < n and proc[j].arrival_time <= total_completion_time:
+                inside = True
+                li.append([j, proc[j].burst_time])
+                j += 1
 
-        if fully == True:
-            # Process with index 'index' will be executed fully
-            proc[index].completion_time = total_completion_time + proc[index].burst_time
+        if elem[1] != 0:
+            li.append(elem)
+        else:
+            proc[index].completion_time = total_completion_time
             proc[index].turnaround_time = proc[index].completion_time - proc[index].arrival_time
             proc[index].waiting_time = proc[index].turnaround_time - proc[index].burst_time
 
@@ -86,27 +82,21 @@ def run(process):
             proc[index].burst_time = 0
 
             # Updating total
-            total_completion_time = proc[index].completion_time
             total_turnaround_time += proc[index].turnaround_time
             total_waiting_time += proc[index].waiting_time
 
-            li.pop(0)  # First element popped
-            count += 1  # A process fully executed
-            if count != n:
-                if len(li) == 0:
-                    total_completion_time = proc[j].arrival_time
+            count += 1
 
-        else:
-            # Find how much it will run
-            how_much = proc[j].arrival_time - total_completion_time
-            # remaining = proc[j].burst_time - how_much
+            if count != n and len(li) == 0:
+                gantt.append((proc[pre].p_id, (pre_comp, total_completion_time - pre_comp)))
+                total_completion_time = proc[j].arrival_time
+                li.append([j, proc[j].burst_time])
+                index = j
+                pre = j
+                pre_comp = total_completion_time
+                j += 1
 
-            proc[index].burst_time -= how_much
-
-            li[0][1][1] = proc[index].burst_time
-
-            # Updating total
-            total_completion_time += how_much
+        li = sorted(li, key=lambda b: b[1])
 
     if total_completion_time != pre_comp:
         gantt.append((proc[pre].p_id, (pre_comp, total_completion_time - pre_comp)))
@@ -115,7 +105,7 @@ def run(process):
         proc[i].burst_time = burst_array[i]
 
     return {
-        'name': 'PR-P',
+        'name': 'SRTF',
         'avg_turnaround_time': total_turnaround_time / len(process),
         'avg_waiting_time': total_waiting_time / len(process),
         'avg_response_time': total_response_time / len(process),
