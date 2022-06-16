@@ -132,6 +132,7 @@ def plot_gantt(result):
     ax.set_ylim(0, 30)  # Sets the y limit
     ax.set_yticks([10])  # Ticks on y-axis
     ax.set_yticklabels(['1'])  # Labels on y-axis
+    ax.set_xlabel('Time', fontweight='bold')
 
     on_x_axis = list(map(lambda gnt: gnt[1][0], gantt))
     on_x_axis.append(gantt[-1][1][0] + gantt[-1][1][1])  # Now the last mark will also be visible

@@ -48,6 +48,7 @@ def run(processes):
     }
 
 
+# If this file is executed directly -> run temporary test-cases
 def main():
     result = run(processes)
     print("Avg Waiting Time: {}".format(result['avg_waiting_time']))
