@@ -1,15 +1,15 @@
 from src.utils.test import processes
-import src.utils.graph as graph
 import src.utils.table as table
+import src.utils.graph as graph
 
 
 def run(processes):
     """
-        Priority Scheduling (Non-Preemptive)
+        SJF (Shortest Job First) (Non-Preemptive)
 
     """
 
-    print('running priority-np')
+    print('running shortest-job-first...')
     gantt = []
 
     # Initialisation
@@ -26,15 +26,15 @@ def run(processes):
         li = []
         for j in range(i, len(proc)):
             if proc[j].arrival_time <= total_completion_time:
-                li.append((j, proc[j].priority))
+                li.append((j, proc[j].burst_time))
 
-        li = sorted(li, key=lambda k: k[1])  # Sorted on the basis of priority
+        li = sorted(li, key=lambda k: k[1])  # Sorted on the basis of burst time
         if len(li) == 0:
             index = i
             for j in range(i + 1, len(proc)):
                 if proc[j].arrival_time < proc[index].arrival_time:
                     index = j
-                elif proc[j].arrival_time == proc[index].arrival_time and proc[j].priority < proc[index].priority:
+                elif proc[j].arrival_time == proc[index].arrival_time and proc[j].burst_time < proc[index].burst_time:
                     index = j
         else:
             index = li[0][0]
@@ -58,18 +58,19 @@ def run(processes):
 
         proc[i], proc[index] = proc[index], proc[i]  # swapping
 
-    # proc = sorted(proc, key=lambda proc: proc.p_id)
-
     return {
-        'name': 'PR-NP',
-        'avg_turnaround_time': total_turnaround_time / len(proc),
+        'name': 'SJF',
         'avg_waiting_time': total_waiting_time / len(proc),
         'avg_response_time': total_response_time / len(proc),
+        'avg_turnaround_time': total_turnaround_time / len(proc),
         'processes': proc,
         'gantt': gantt
     }
 
 
+
+
+# If this file is executed directly -> run temporary test-cases
 def main():
     result = run(processes)
     print("Avg Waiting Time: {}".format(result['avg_waiting_time']))
@@ -81,4 +82,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

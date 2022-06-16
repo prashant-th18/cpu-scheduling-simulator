@@ -52,8 +52,8 @@ def run(processes):
 def main():
     result = run(processes)
     print("Avg Waiting Time: {}".format(result['avg_waiting_time']))
-    print("Avg Waiting Time: {}".format(result['avg_waiting_time']))
-    print("Avg Waiting Time: {}".format(result['avg_waiting_time']))
+    print("Avg Turnaround Time: {}".format(result['avg_turnaround_time']))
+    print("Avg Response Time: {}".format(result['avg_response_time']))
     table.plot(result['processes'])
     graph.plot_gantt(result)
 
